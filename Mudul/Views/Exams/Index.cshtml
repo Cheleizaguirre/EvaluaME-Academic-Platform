@@ -1,0 +1,85 @@
+﻿@model IEnumerable<Mudul.EntityModels.Exam>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "_LayoutTeacher";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Crear Nuevo</a>
+
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.SubjectId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TeacherId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PublishDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExamType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeLimit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.H5pcontentId)
+            </th>
+            
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubjectId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TeacherId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PublishDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExamType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeLimit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.H5pcontentId)
+            </td>
+           
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ExamId">Editar</a> |
+                <a asp-action="Details" asp-route-id="@item.ExamId">Detalles</a> |
+                <a asp-action="Delete" asp-route-id="@item.ExamId">Eliminar</a>
+                    <a asp-area="" asp-controller="ExamQuestions" asp-action="Index" asp-route-examId="@item.ExamId" class="nav-link">Preguntas</a>
+
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<a asp-action="Evaluations" asp-controller="Teacher">Regresar</a>

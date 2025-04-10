@@ -1,0 +1,48 @@
+@model IEnumerable<Mudul.EntityModels.ExamSubmission>
+
+@{
+    ViewData["Title"] = "Mis Envíos";
+    Layout = "_LayoutStudent";
+}
+
+<h1>Mis Envíos</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Examen</th>
+            <th>Fecha de Envío</th>
+            <th>Intento</th>
+            <th>Nota Total (del intento)</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var submission in Model)
+        {
+            // Si en ResponseData se guardaron las respuestas con el peso final,
+            // esta nota no está deserializada, así que puede ser necesario calcularla al momento
+            // o tomarla de otra propiedad; aquí asumiremos que no la mostramos.
+            <tr>
+                <td>@submission.Exam.Title</td>
+                <td>@submission.SubmissionDate?.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@submission.AttemptNumber</td>
+                <td>
+                    <!-- Opcional: Si guardaras la nota en GlobalResult u otro campo, la mostrarías aquí -->
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@submission.SubmissionId" class="btn btn-info btn-sm">Ver Detalles</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Attempt" asp-route-examId="1" class="btn btn-primary">Intentar Otro Examen</a>

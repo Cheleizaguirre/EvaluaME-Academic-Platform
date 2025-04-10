@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Resultado del Examen";
+    Layout = "_LayoutStudent";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h2>Resultado del Examen</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Mensaje:</strong> @TempData["SuccessMessage"]</p>
+            <p><strong>Nota Obtenida:</strong> @TempData["ExamGrade"]</p>
+            <p><strong>Total Posible:</strong> @TempData["TotalPossible"]</p>
+            <p><strong>Porcentaje:</strong> @TempData["PercentGrade"] %</p>
+            <p><strong>Tiempo Empleado:</strong> @TempData["TimeTaken"]</p>
+            <p><strong>Número de Intento:</strong> @TempData["AttemptNumber"]</p>
+        </div>
+        <div class="card-footer">
+            <a asp-action="Index" asp-controller="Subject" asp-route-id="@TempData["SubjectId"]" class="btn btn-primary">
+                Volver a la Clase
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,186 @@
+@model Mudul.Models.ExamAttemptViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+@{
+    ViewData["Title"] = "Intentar Examen";
+    Layout = "_LayoutStudent";
+}
+
+<h1>@Model.Exam.Title</h1>
+<p>@Model.Exam.Description</p>
+@if (Model.Exam.TimeLimit.HasValue && Model.Exam.TimeLimit.Value > 0)
+{
+    <p><strong>Tiempo Límite:</strong> @Model.Exam.TimeLimit minutos</p>
+    <p><strong>Tiempo Restante:</strong> <span id="timer" style="font-size:24px;color:red;font-weight:bold;"></span></p>
+}
+
+<form asp-action="Attempt" method="post">
+    @Html.AntiForgeryToken()
+    <!-- Enviar el examId y el StartTime (en formato ISO) -->
+    <input type="hidden" name="examId" value="@Model.Exam.ExamId" />
+    <input type="hidden" name="StartTime" value="@DateTime.Now.ToString("o")" />
+
+    @foreach (var question in Model.ExamQuestions)
+    {
+        decimal originalWeight = question.Weight ?? 0;
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5>
+                    Pregunta @question.QuestionId
+                    (Puntaje: <span id="WeightLabel_@question.QuestionId">@originalWeight.ToString("0.00")</span>)
+                </h5>
+            </div>
+            <div class="card-body">
+                <p>@question.QuestionText</p>
+                <div class="form-group">
+                    <label>Respuesta:</label>
+                    <textarea name="Answer_@question.QuestionId" class="form-control" rows="3" placeholder="Escribe tu respuesta aquí..."></textarea>
+                </div>
+                @if (question.QuestionType == "codigo")
+                {
+                    <!-- Campo oculto con la configuración esperada para la validación -->
+                    <input type="hidden" id="ExpectedConfig_@question.QuestionId" name="ExpectedConfig_@question.QuestionId" value='@Html.Raw(question.JobeConfiguration ?? "{}")' />
+
+                    <div class="form-group mt-2">
+                        <button type="button" class="btn btn-info" onclick="validateCode(@question.QuestionId)">Validar Código</button>
+                    </div>
+                    <!-- Campo oculto para contar los intentos de validación (máximo 2) -->
+                    <input type="hidden" id="ValidationCount_@question.QuestionId" value="0" />
+                }
+                <!-- Campo oculto para almacenar el peso final (inicialmente el original) -->
+                <input type="hidden" id="FinalWeight_@question.QuestionId" name="FinalWeight_@question.QuestionId" value="@originalWeight" />
+            </div>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary">Enviar Examen</button>
+</form>
+
+@section Scripts {
+    <script>
+        // --- TIMER ---
+        window.addEventListener('DOMContentLoaded', function () {
+            var timeLimit = @(Model.Exam.TimeLimit.HasValue ? Model.Exam.TimeLimit.Value : 0);
+            if (timeLimit > 0) {
+                var countdown = timeLimit * 60; // en segundos
+                var timerElement = document.getElementById("timer");
+                var interval = setInterval(function () {
+                    var minutes = Math.floor(countdown / 60);
+                    var seconds = countdown % 60;
+                    timerElement.textContent = minutes + "m " + (seconds < 10 ? "0" + seconds : seconds) + "s";
+                    if (countdown <= 0) {
+                        clearInterval(interval);
+                        alert("Se acabó el tiempo. El examen se enviará automáticamente.");
+                        document.forms[0].submit();
+                    }
+                    countdown--;
+                }, 1000);
+            }
+        });
+
+        // --- VALIDAR CÓDIGO ---
+        function validateCode(questionId) {
+            var answerElement = document.getElementsByName("Answer_" + questionId)[0];
+            var sourceCode = answerElement.value.trim();
+            if (!sourceCode) {
+                alert("Ingresa el código antes de validar.");
+                setGradeZero(questionId);
+                return;
+            }
+            var defaultLanguage = "python3"; // Valor por defecto
+
+            // Obtener la configuración esperada desde el campo oculto
+            var expectedConfigStr = document.getElementById("ExpectedConfig_" + questionId).value;
+            var expectedConfig = {};
+            try {
+                expectedConfig = JSON.parse(expectedConfigStr);
+            } catch (e) {
+                alert("No se pudo procesar la configuración esperada.");
+                setGradeZero(questionId);
+                return;
+            }
+            // Extraer el expected_output de la configuración, si existe
+            var expectedOutput = "";
+            if (expectedConfig.run_spec && expectedConfig.run_spec.expected_output) {
+                expectedOutput = expectedConfig.run_spec.expected_output;
+            } else {
+                alert("La configuración esperada no contiene 'expected_output'.");
+                setGradeZero(questionId);
+                return;
+            }
+
+            // Armar el payload para la API JOBe
+            var payload = {
+                run_spec: {
+                    language_id: defaultLanguage,
+                    sourcecode: sourceCode,
+                    stdin: "",
+                    expected_output: expectedOutput,
+                    max_cpu_time: 5,
+                    max_memory: 64000000
+                }
+            };
+
+            fetch("https://glowworm-chief-probably.ngrok-free.app/jobe/index.php/restapi/runs", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(response => response.text())
+                .then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        throw new Error(text);
+                    }
+                })
+                .then(data => {
+                    if (data.outcome === 15) {
+                        alert("¡Código válido!");
+                        // Si es correcto, no se descuenta nada
+                    } else {
+                        alert("Código incorrecto.\nSalida: " + (data.stdout || "") + "\nError: " + (data.stderr || ""));
+                        deductValidationPoint(questionId);
+                    }
+                })
+                .catch(error => {
+                    alert("No se pudo validar el código: " + error.message);
+                    deductValidationPoint(questionId);
+                });
+        }
+
+        // Función que descuenta 1 punto por validación fallida, hasta dos veces máximo
+        function deductValidationPoint(questionId) {
+            var countElement = document.getElementById("ValidationCount_" + questionId);
+            var count = parseInt(countElement.value) || 0;
+            if (count >= 2) {
+                alert("Has alcanzado el máximo de intentos de validación para esta pregunta.");
+                return;
+            }
+            count++;
+            countElement.value = count;
+
+            var weightInput = document.getElementById("FinalWeight_" + questionId);
+            var weightLabel = document.getElementById("WeightLabel_" + questionId);
+            var currentWeight = parseFloat(weightInput.value) || 0;
+            // Descontar 1 punto, sin bajar de 0
+            currentWeight = Math.max(0, currentWeight - 1);
+            weightInput.value = currentWeight;
+            weightLabel.textContent = currentWeight.toFixed(2);
+        }
+
+        // Función para asignar 0 puntos (en caso de respuesta vacía o error grave)
+        function setGradeZero(questionId) {
+            var weightInput = document.getElementById("FinalWeight_" + questionId);
+            var weightLabel = document.getElementById("WeightLabel_" + questionId);
+            weightInput.value = "0";
+            weightLabel.textContent = "0.00";
+            // Opcional: se puede actualizar el contador de validaciones si se desea bloquear futuros intentos
+            document.getElementById("ValidationCount_" + questionId).value = "2";
+        }
+    </script>
+
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -1,0 +1,50 @@
+/* Estilo para el input de búsqueda general */
+.dataTables_filter input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+    .search-container label {
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+.dt-button {
+    margin-left: 5px;
+}
+
+/* Diseño de botones */
+.btn-custom {
+    margin-left: 5px;
+}
+
+/* Estilo para las tarjetas */
+.card {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+/* Mejorar el diseño de la tabla */
+.table th, .table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table thead {
+    background-color: #f4f6f9;
+}
+
+div.dataTables_filter {
+    display: none;
+}

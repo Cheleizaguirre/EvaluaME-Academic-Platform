@@ -1,0 +1,67 @@
+﻿@using Mudul.EntityModels
+@using Mudul.Helpers
+
+@{
+	Layout = "_LayoutAdminLTE";
+}
+
+<!-- CustomStyles -->
+@RenderSection("CustomStyles", required: false)
+<!-- /.CustomStyles -->
+
+@section SidebarItems {
+	<!-- Home view -->
+	<li class="nav-item">
+		<a href="@Url.Action("Index","Coordinator")" class="nav-link @Html.IsActive("Index","Coordinator")">
+			<i class="nav-icon fas fa-home"></i>
+			<p>Inicio</p>
+		</a>
+	</li>
+
+	<!-- Teacher Management -->
+	<li class="nav-item">
+		<a href="@Url.Action("TeacherManagement","Coordinator")" class="nav-link @Html.IsActive("TeacherManagement","Coordinator")">
+			<i class="nav-icon fas fa-chalkboard-teacher">&ensp;</i>
+			<p>Administrar Docentes</p>
+		</a>
+	</li>
+
+	<!-- Student Management -->
+	<li class="nav-item">
+		<a href="@Url.Action("StudentManagement","Coordinator")" class="nav-link @Html.IsActive("StudentManagement","Coordinator")">
+			<i class="nav-icon fa-regular fa-id-card"></i>
+			<p>Administrar Estudiantes</p>
+		</a>
+	</li>
+
+	<!-- Student Registration -->
+	<li class="nav-item">
+		<a href="@Url.Action("Index","Enrollment")" class="nav-link @Html.IsActive("Index","Enrollment")">
+			<i class="nav-icon fa-solid fa-address-card"></i>
+			<p>Matricular Estudiante</p>
+		</a>
+	</li>
+
+	<!-- Assignment Management -->
+	<li class="nav-item">
+		<a href="@Url.Action("SubjectManagement","Coordinator")" class="nav-link @Html.IsActive("SubjectManagement","Coordinator")">
+			<i class="nav-icon fa-solid fa-book"></i>
+			<p>Administrar Clases</p>
+		</a>
+	</li>
+
+	<!-- Profile View -->
+	<li class="nav-item">
+		<a href="@Url.Action("Profile","Coordinator")" class="nav-link @Html.IsActive("Profile","Coordinator")">
+			<i class="nav-icon fas fa-user"></i>
+			<p>Perfil</p>
+		</a>
+	</li>
+}
+
+<!-- Main content -->
+@RenderBody()
+<!-- /.content -->
+<!-- Scripts content-->
+@await RenderSectionAsync("Scripts", required: false)
+<!-- /.scripts-->

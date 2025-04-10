@@ -1,0 +1,75 @@
+@using Mudul.ViewModels
+@model ExamQuestionsViewModel
+
+@{
+    bool isBank = (Model.Exam == null);
+    Layout = "_LayoutTeacher";
+}
+
+@if (isBank)
+{
+    <h1>Banco de Preguntas</h1>
+    <!-- Cuando es banco, examId = 0 -->
+    <p>
+        <a asp-action="Create" asp-route-examId="0" class="btn btn-success">Crear Nueva Pregunta</a>
+    </p>
+}
+else
+{
+    <h1>Examen: @Model.Exam.Title (@Model.Exam.ExamId)</h1>
+
+    <!-- Botón para crear pregunta de este examen -->
+    <p>
+        <a asp-action="Create" asp-route-examId="@Model.Exam.ExamId" class="btn btn-success">
+            Crear Nueva Pregunta
+        </a>
+    </p>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ExamId</th>
+            <th>Texto</th>
+            <th>Tipo</th>
+            <th>Puntaje</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.ExamQuestions != null && Model.ExamQuestions.Any())
+        {
+            foreach (var item in Model.ExamQuestions)
+            {
+                <tr>
+                    <td>@item.ExamId</td>
+                    <td>@item.QuestionText</td>
+                    <td>@item.QuestionType</td>
+                    <td>@item.Weight</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.QuestionId">Detalles</a> |
+                        <a asp-action="Delete" asp-route-id="@item.QuestionId">Eliminar</a>
+                        <!-- a asp-action="Edit" asp-route-id="@item.QuestionId">Editar</a -->
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5">No hay preguntas registradas.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (!isBank)
+{
+    <!-- Botón para volver a la asignatura -->
+    <a asp-controller="Subject"
+       asp-action="Index"
+       asp-route-id="@Model.Exam.SubjectId"
+       class="btn btn-secondary">
+        Volver a la Asignatura
+    </a>
+}

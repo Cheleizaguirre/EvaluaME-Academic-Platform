@@ -1,0 +1,168 @@
+﻿@model Mudul.Models.StudentModel
+
+@{
+	var controllerName = User.IsInRole("Admin") ? "Admin" : "Coordinator";
+}
+
+<!-- Modal para Editar Alumno -->
+<div class="modal fade" id="editStudentModal" tabindex="-1" role="dialog" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header bg-lightblue text-white">
+				<h5 class="modal-title" id="editStudentModalLabel">
+					<i class="fas fa-edit"></i> Editar Alumno
+				</h5>
+				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+
+			<form asp-controller="@controllerName" asp-action="StudentEdit" method="post">
+				<div class="modal-body">
+					<input type="hidden" name="UserId" value="@Model.UserId" />
+
+					<div class="form-row">
+						<div class="form-group col-md-6">
+							<label for="FullName">Nombre Completo</label>
+							<input type="text" class="form-control" id="FullName" name="FullName" value="@Model.FullName" required />
+						</div>
+
+						<div class="form-group col-md-6">
+							<label for="Email">Correo Electrónico</label>
+							<input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" required />
+						</div>
+					</div>
+
+					<div class="form-row">
+						<div class="form-group col-md-6">
+							<label for="PhoneNumber">Número de Teléfono</label>
+							<input type="text" class="form-control" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" />
+						</div>
+
+						<div class="form-group col-md-6">
+							<label for="NationalId">Número de Identidad</label>
+							<input type="text" class="form-control" id="NationalId" name="NationalId" value="@Model.NationalId" required/>
+						</div>
+					</div>
+
+					<div class="form-check mt-2 mb-3">
+						<input type="checkbox" class="form-check-input" id="IsChangingPassword" name="IsChangingPassword" />
+						<label class="form-check-label" for="IsChangingPassword">Reiniciar contraseña</label>
+					</div>
+
+				</div>
+
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">
+						<i class="fas fa-times"></i> Cancelar
+					</button>
+					<button type="submit" class="btn btn-success">
+						<i class="fas fa-save"></i> Guardar Cambios
+					</button>
+				</div>
+			</form>
+			<div class="modal-body">
+				<hr />
+				<!-- Matrículas -->
+				<h5 class="text-primary">Matrícula</h5>
+
+				@Html.AntiForgeryToken()
+				@if (Model.Enrollments != null && Model.Enrollments.Any())
+				{
+					<div class="card">
+						<table class="table table-striped" id="enrollment-table">
+							<thead>
+								<tr>
+									<th>Clase</th>
+									<th>Maestro</th>
+									<th style="width: 100px;">Acciones</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var enrollment in Model.Enrollments)
+								{
+									<tr data-id="@enrollment.EnrollmentId">
+										<td>@enrollment.Subject?.Name</td>
+										<td>@enrollment.Subject?.Teacher?.UserName</td>
+										<td>
+											<a href="#" class="btn btn-sm btn-danger delete-enrollment" data-id="@enrollment.EnrollmentId">
+												<i class="fas fa-trash-alt"></i>
+											</a>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+				}
+				else
+				{
+					<p class="text-muted" id="no-enrollments-msg">Este estudiante no está matriculado en ninguna clase.</p>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).on("click", ".delete-enrollment", function (e) {
+		e.preventDefault();
+		const $btn = $(this);
+		const enrollmentId = $btn.data("id");
+		const token = $('input[name="__RequestVerificationToken"]').val();
+
+		Swal.fire({
+			title: "¿Eliminar matrícula?",
+			text: "Esta acción no se puede deshacer.",
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#d33",
+			cancelButtonColor: "#3085d6",
+			confirmButtonText: "Sí, eliminar",
+			cancelButtonText: "Cancelar"
+		}).then((result) => {
+			if (result.isConfirmed) {
+				$.ajax({
+					url: "@Url.Action("DeleteStudentEnrollment", "Enrollment")",
+					type: "POST",
+					data: {
+						enrollmentId: enrollmentId,
+						__RequestVerificationToken: token
+					},
+					success: function () {
+						const $row = $(`tr[data-id="${enrollmentId}"]`);
+						$row.fadeOut(400, function () {
+							$row.remove();
+
+							// Si no quedan filas en la tabla, ocultar la tarjeta y mostrar mensaje vacío
+							if ($("#enrollment-table tbody tr").length === 0) {
+								$(".card").remove();
+								$(".modal-body").append('<p class="text-muted" id="no-enrollments-msg">Este estudiante no está matriculado en ninguna clase.</p>');
+							}
+						});
+
+						Swal.fire({
+							icon: "success",
+							title: "Matrícula eliminada",
+							showConfirmButton: false,
+							timer: 2000,
+							toast: true,
+							position: "top-end"
+						});
+					},
+					error: function () {
+						Swal.fire({
+							icon: "error",
+							title: "Error",
+							text: "No se pudo eliminar la matrícula.",
+							toast: true,
+							position: "top-end",
+							showConfirmButton: false,
+							timer: 3000
+						});
+					}
+				});
+			}
+		});
+	});
+</script>

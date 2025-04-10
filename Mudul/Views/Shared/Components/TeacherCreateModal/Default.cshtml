@@ -1,0 +1,49 @@
+﻿@model Mudul.Models.TeacherModel
+
+<div class="modal fade" id="createTeacherModal" tabindex="-1" role="dialog" aria-labelledby="createTeacherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form asp-action="CreateTeacher" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Crear nuevo docente</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nombre completo</label>
+                        <input name="FullName" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>DNI</label>
+                        <input name="NationalId" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input name="PhoneNumber" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Clase a asignar</label>
+                        <select name="SubjectToAssign.SubjectId" class="form-control">
+                            <option value="">Seleccione una clase</option>
+                            @foreach (var subject in Model.Subjects)
+                            {
+                                    <option value="@subject.SubjectId">@subject.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Crear</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

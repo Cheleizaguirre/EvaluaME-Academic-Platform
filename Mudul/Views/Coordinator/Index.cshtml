@@ -1,0 +1,83 @@
+@model Mudul.Models.CoordinatorModel
+
+@{
+	ViewData["Title"] = "Coordinador";
+	Layout = "_LayoutCoordinator";
+}
+
+@section CustomStyles {
+	<link rel="stylesheet" href="~/css/coordinator/Index/styles.css" asp-append-version="true" />
+}
+
+<div class="container-fluid">
+	<div class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1>¡Bienvenido!</h1>
+				</div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item"><a>Home</a></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="small-box bg-info fade-in">
+		<div class="inner">
+			<h3>
+				Administrar Docentes
+			</h3>
+			<p>
+				Gestionar los docentes del área de @Model.Areas.FirstOrDefault()?.Name.
+			</p>
+		</div>
+		<div class="icon">
+			<i class="fa-solid fa-chalkboard-user"></i>
+		</div>
+		<a href="@Url.Action("TeacherManagement","Coordinator")" class="small-box-footer">
+			Acceder
+			<i class="fa-solid fa-circle-right"></i>
+		</a>
+	</div>
+
+	<div class="small-box bg-lightblue fade-in">
+		<div class="inner">
+			<h3>
+				Administrar Estudiantes
+			</h3>
+			<p>
+				Gestionar los estudiantes del sistema.
+			</p>
+		</div>
+		<div class="icon">
+			<i class="fa-regular fa-id-card"></i>
+		</div>
+		<a href="@Url.Action("StudentManagement","Coordinator")" class="small-box-footer">
+			Acceder
+			<i class="fa-solid fa-circle-right"></i>
+		</a>
+	</div>
+
+	<div class="small-box bg-success fade-in">
+		<div class="inner">
+			<h3>
+				Administrar Clases
+			</h3>
+			<p>
+				Gestionar las clases del área de @Model.Areas.FirstOrDefault()?.Name.
+			</p>
+		</div>
+		<div class="icon">
+			<i class="fa-solid fa-book"></i>
+		</div>
+		<a href="@Url.Action("SubjectManagement","Coordinator")" class="small-box-footer">
+			Acceder
+			<i class="fa-solid fa-circle-right"></i>
+		</a>
+	</div>
+
+</div>
+

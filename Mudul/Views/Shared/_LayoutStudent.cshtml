@@ -1,0 +1,52 @@
+@using Mudul.Helpers
+
+@{
+	Layout = "_LayoutAdminLTE";
+}
+
+<!-- CustomStyles -->
+@RenderSection("CustomStyles",required: false)
+<!-- /.CustomStyles -->
+
+@section SidebarItems {
+
+	<!-- Home view -->
+	<li class="nav-item">
+		<a href="@Url.Action("Index", "Student")" class="nav-link @Html.IsActive("Index", "Student")">
+			 <i class="nav-icon fas fa-home"></i>
+			<p>Inicio</p>
+		</a>
+	</li>
+
+	<!-- Subject Views [DropDown Menu] -->
+	<li class="nav-item">
+		<a href="#" class="nav-link">
+			<i class="nav-icon fas fa-book-open"></i>
+			<p>
+				Clases
+				<i class="right fas fa-angle-left"></i>
+			</p>
+		</a>
+		<!-- Student subjects [List on View] -->
+		<ul class="nav nav-treeview">
+			@await Component.InvokeAsync("StudentSubjects")
+		</ul>
+	</li>
+
+
+	<!-- Profile View -->
+	<li class="nav-item">
+		<a href="@Url.Action("Profile", "Student")" class="nav-link @Html.IsActive("Profile", "Student")">
+			<i class="nav-icon fas fa-user"></i>
+			<p>Perfil</p>
+		</a>
+	</li>
+}
+
+<!-- Main content -->
+@RenderBody()
+<!-- /.content -->
+
+<!-- Scripts content-->
+@await RenderSectionAsync("Scripts", required: false)
+<!-- /.scripts-->

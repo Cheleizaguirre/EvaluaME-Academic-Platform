@@ -1,0 +1,57 @@
+﻿@model Mudul.Models.TeacherModel
+
+<!-- Modal para Editar Docente -->
+<div class="modal fade" id="editTeacherModal" tabindex="-1" role="dialog" aria-labelledby="editTeacherModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="editTeacherModalLabel">
+                    <i class="fas fa-edit"></i> Editar Docente
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form asp-controller="Coordinator" asp-action="TeacherEdit" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="UserId" value="@Model.UserId" />
+
+                    <div class="form-group">
+                        <label for="FullName">Nombre Completo</label>
+                        <input type="text" class="form-control" id="FullName" name="FullName" value="@Model.FullName" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Email">Correo Electrónico</label>
+                        <input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="PhoneNumber">Número de Teléfono</label>
+                        <input type="text" class="form-control" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="NationalId">Número de Identidad</label>
+                        <input type="text" class="form-control" id="NationalId" name="NationalId" value="@Model.NationalId" required />
+                    </div>
+
+                    <div class="form-check mt-3">
+                        <input type="checkbox" class="form-check-input" id="IsChangingPassword" name="IsChangingPassword" />
+                        <label class="form-check-label" for="IsChangingPassword">Reiniciar contraseña</label>
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

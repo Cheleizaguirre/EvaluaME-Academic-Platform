@@ -1,0 +1,389 @@
+﻿@model EnrollmentViewModel
+
+@{
+	ViewData["Title"] = "Matrícula Estudiante";
+	var layoutName = "_Layout";
+
+	if (User.IsInRole("Teacher"))
+	{
+		layoutName = "_LayoutTeacher";
+	}
+	else if (User.IsInRole("Coordinator"))
+	{
+		layoutName = "_LayoutCoordinator";
+	}
+	else if (User.IsInRole("Admin"))
+	{
+		layoutName = "_LayoutAdmin";
+	}
+
+	Layout = $"~/Views/Shared/{layoutName}.cshtml";
+
+	// Asignar la clase de rol al body
+	string roleClass = "role-student"; // Default role, the student wouldn't see this page but is a default value
+	if (User.IsInRole("Teacher"))
+	{
+		roleClass = "role-teacher";
+	}
+	else if (User.IsInRole("Coordinator"))
+	{
+		roleClass = "role-coordinator";
+	}
+	else if (User.IsInRole("Admin"))
+	{
+		roleClass = "role-admin";
+	}
+}
+
+@section CustomStyles {
+	<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="~/css/enrollment/StudentManagement/styles.css">
+}
+
+<!-- Menu de navegación -->
+<div class="content-header">
+	<div class="container-fluid">
+		<div class="row mb-2">
+			<div class="col-sm-6">
+				<h1>Matrícula de Estudiante</h1>
+			</div>
+			<div class="col-sm-6">
+				<ol class="breadcrumb float-sm-right">
+					<li class="breadcrumb-item">
+						@{
+							var controllerName = "Home";
+							if (User.IsInRole("Teacher"))
+							{
+								controllerName = "Teacher";
+							}
+							else if (User.IsInRole("Coordinator"))
+							{
+								controllerName = "Coordinator";
+							}
+							else if (User.IsInRole("Admin"))
+							{
+								controllerName = "Admin";
+							}
+						}
+						<a href="@Url.Action("Index", controllerName)">
+							@controllerName
+						</a>
+					</li>
+					<li class="breadcrumb-item">
+						Matrícula de Estudiante
+					</li>
+				</ol>
+			</div>
+		</div>
+	</div>
+</div>
+
+@await Component.InvokeAsync("CreateStudentModal")
+
+<div class="container studentManagement-content @roleClass">
+	<h1>Inscribir Alumnos</h1>
+
+	<!-- Botones principales -->
+	<div class="button-container">
+		<button type="button" data-toggle="modal" data-target="#createStudentModal">
+			<i class="fas fa-user-plus"></i> Inscribir un alumno manualmente
+		</button>
+	</div>
+
+	<!-- Formulario para subir archivo -->
+	<form asp-controller="Enrollment" asp-action="UploadExcel" method="post" enctype="multipart/form-data"
+	class="upload-section">
+		<h2>Subir cuadro SACE</h2>
+		<div class="drag-drop-area" id="drag-drop-area">
+			<i class="fas fa-cloud-upload-alt"></i>
+			<p>Arrastra y suelta archivos aquí o haz clic para seleccionar</p>
+			<input type="file" name="formFile" id="fileInput" hidden />
+		</div>
+		<div class="file-name" id="file-name">Sin archivos seleccionados</div>
+		<button type="submit" id="upload-btn" class="upload-btn" disabled>
+			<i class="fas fa-cloud-upload-alt"></i> Subir
+		</button>
+	</form>
+
+	<!-- Tabla de estudiantes cargados -->
+	<div class="table-section">
+		<h2>Lista de Alumnos</h2>
+
+		<div class="table-buttons">
+			<!-- Formulario para enviar a la base de datos -->
+			<form id="enrollment-form" asp-controller="Enrollment" asp-action="SaveStudents" method="post">
+				@Html.AntiForgeryToken()
+				<button type="submit" id="upload-btn-db">
+					<i class="fas fa-database"></i> Subir a BD
+				</button>
+			</form>
+			<a href="@Url.Action("Index", "Enrollment")">
+				<button type="button">
+					<i class="fa-solid fa-xmark"></i> Cancelar
+				</button>
+			</a>
+		</div>
+
+		<!-- Tabla -->
+		<table>
+			<thead>
+				<tr>
+					<th>Número de Identidad</th>
+					<th>Nombre Completo</th>
+				</tr>
+			</thead>
+			<tbody>
+				@if (Model.Students == null || Model.Students.Count == 0)
+				{
+					<tr>
+						<td colspan="2">No hay alumnos inscritos</td>
+					</tr>
+				}
+				else
+				{
+					@foreach (var student in Model.Students)
+					{
+						<tr>
+							<td>@student[0]</td>
+							<td>@student[1]</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<!-- Modal para inscribir alumnos -->
+<div class="modal fade" id="createStudentModal" tabindex="-1" role="dialog" aria-labelledby="createStudentModalLabel"
+aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="createStudentModalLabel">Inscribir Alumno</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				@if (User.IsInRole("Teacher"))
+				{
+					<label for="class-select">Selecciona la clase:</label>
+					<select id="class-select" name="class" class="form-control">
+						@foreach (var subject in Model.Subjects)
+						{
+							<option value="@subject.SubjectId">@subject.Name</option>
+						}
+					</select>
+				}else if (User.IsInRole("Coordinator"))
+				{
+					<label for="class-select">Selecciona la clase:</label>
+					<select id="coordinator-class-select" name="SubjectId" class="form-control select2">
+						@foreach (var subject in Model.Subjects)
+						{
+							<option value="@subject.SubjectId">@subject.Name</option>
+						}
+					</select>
+				}
+
+				<label for="student-name">Nombre del Alumno:</label>
+				<input type="text" id="student-name" class="form-control" />
+
+				<label for="student-id">Número de Identidad:</label>
+				<input type="text" id="student-id" class="form-control" />
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+				<button type="button" class="btn btn-primary" id="save-student-btn">Guardar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+
+
+	<script>
+		$(document).ready(function () {
+			$('#coordinator-class-select').select2({
+				placeholder: 'Selecciona una clase',
+				width: '100%',
+				allowClear: true
+			});
+		});
+	</script>
+
+
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			const dropArea = document.getElementById("drag-drop-area");
+			const fileInput = document.getElementById("fileInput");
+			const fileNameDisplay = document.getElementById("file-name");
+			const uploadBtn = document.getElementById("upload-btn");
+			const enrollmentForm = document.getElementById("enrollment-form");
+			const singleStudentForm = document.getElementById("singleStudent-form");
+
+			if (!dropArea || !fileInput || !fileNameDisplay || !uploadBtn || !enrollmentForm) return;
+
+			// Manejar el arrastre de archivos
+			["dragenter", "dragover"].forEach(eventName => {
+				dropArea.addEventListener(eventName, (e) => {
+					e.preventDefault();
+					dropArea.classList.add("drag-over");
+				});
+			});
+
+			["dragleave", "drop"].forEach(eventName => {
+				dropArea.addEventListener(eventName, (e) => {
+					e.preventDefault();
+					dropArea.classList.remove("drag-over");
+				});
+			});
+
+			// Manejar el drop de archivos
+			dropArea.addEventListener("drop", (e) => {
+				e.preventDefault();
+				const files = e.dataTransfer.files;
+				if (files.length > 0) {
+					fileInput.files = files;
+					fileNameDisplay.textContent = files[0].name;
+					uploadBtn.disabled = false;
+				}
+			});
+
+			// Activar la selección de archivo al hacer click en el área de arrastre
+			dropArea.addEventListener("click", () => fileInput.click());
+
+			// Manejar cambio en la selección de archivos
+			fileInput.addEventListener("change", () => {
+				if (fileInput.files.length > 0) {
+					fileNameDisplay.textContent = fileInput.files[0].name;
+					uploadBtn.disabled = false;
+				}
+			});
+
+			// Manejar el clic en el botón de "Subir a BD"
+			document.getElementById("upload-btn-db").addEventListener("click", function (event) {
+				event.preventDefault();
+
+				// Obtener las clases del Model
+				var subjects = @Html.Raw(Json.Serialize(Model.Subjects));
+
+				// Crear un objeto para pasar a SweetAlert
+				var subjectOptions = {};
+				subjects.forEach(function (subject) {
+					subjectOptions[subject.subjectId] = subject.name;
+				});
+
+				// Mostrar el SweetAlert
+				Swal.fire({
+					title: 'Selecciona la clase para los estudiantes',
+					input: 'select',
+					inputOptions: subjectOptions,
+					inputPlaceholder: 'Selecciona una clase',
+					showCancelButton: true,
+					confirmButtonText: 'Guardar',
+					cancelButtonText: 'Cancelar',
+					showLoaderOnConfirm: true,
+					preConfirm: (subjectId) => {
+						if (!subjectId) {
+							Swal.showValidationMessage('Por favor, selecciona una clase');
+						} else {
+
+							var input = document.createElement('input');
+							input.type = 'hidden';
+							input.name = 'SubjectId';
+							input.value = subjectId;
+
+
+							enrollmentForm.appendChild(input);
+
+							enrollmentForm.submit();
+						}
+					}
+				});
+			});
+
+			// Manejar el clic en el botón de "Subir a BD" cuando se matricula un solo estudiante
+			document.getElementById("uploadSingleStudent-btn-db").addEventListener("click", function (event) {
+				event.preventDefault();
+
+				// Obtener las clases del Model
+				var subjects = @Html.Raw(Json.Serialize(Model.Subjects));
+
+				// Crear un objeto para pasar a SweetAlert
+				var subjectOptions = {};
+				subjects.forEach(function (subject) {
+					subjectOptions[subject.subjectId] = subject.name;
+				});
+
+				// Mostrar el SweetAlert
+				Swal.fire({
+					title: 'Selecciona la clase para el estudiante',
+					input: 'select',
+					inputOptions: subjectOptions,
+					inputPlaceholder: 'Selecciona una clase',
+					showCancelButton: true,
+					confirmButtonText: 'Guardar',
+					cancelButtonText: 'Cancelar',
+					showLoaderOnConfirm: true,
+					preConfirm: (subjectId) => {
+						if (!subjectId) {
+							Swal.showValidationMessage('Por favor, selecciona una clase');
+						} else {
+
+							var input = document.createElement('input');
+							input.type = 'hidden';
+							input.name = 'SubjectId';
+							input.value = subjectId;
+
+
+							singleStudentForm.appendChild(input);
+
+							singleStudentForm.submit();
+						}
+					}
+				});
+			});
+
+		});
+	</script>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+		@if (TempData["SuccessMessage"] != null)
+		{
+			<text>
+							Swal.fire({
+								toast: true,
+							position: "top-end",
+							title: "¡Éxito!",
+							text: decodeURIComponent("@Uri.EscapeDataString(TempData["SuccessMessage"].ToString())"),
+							icon: "success",
+							showConfirmButton: false,
+							timer: 3000,
+							timerProgressBar: true
+															});
+			</text>
+		}
+
+		@if (TempData["ErrorMessage"] != null)
+		{
+			<text>
+								Swal.fire({
+									toast: true,
+								position: "top-end",
+								title: "¡Error!",
+								text: decodeURIComponent("@Uri.EscapeDataString(TempData["ErrorMessage"].ToString())"),
+								icon: "error",
+								showConfirmButton: false,
+								timer: 3000,
+								timerProgressBar: true
+																});
+			</text>
+		}
+							});
+	</script>
+}

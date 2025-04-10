@@ -1,0 +1,165 @@
+@model Mudul.EntityModels.ExamQuestion
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@using Mudul.Models
+
+@{
+    ViewData["Title"] = "Crear Pregunta de Examen";
+    Layout = "_LayoutTeacher";
+    // Cargamos la lista de lenguajes desde ViewBag; si no viene, se asigna lista vacía.
+    var languages = ViewBag.Languages as List<JobeLanguage> ?? new List<JobeLanguage>();
+
+    // Mostrar la sección de "código" solo si el tipo de pregunta es "codigo"
+    var displayCodigo = Model?.QuestionType == "codigo" ? "block" : "none";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2>Crear Pregunta para el Examen</h2>
+        </div>
+        <div class="card-body">
+            <p class="lead">
+                Un examen puede contener múltiples preguntas. Si la pregunta es de tipo "código", selecciona el lenguaje,
+                ingresa el código y presiona "Validar Código" antes de guardar.
+            </p>
+            <form asp-action="Create" method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <!-- Campo oculto para ExamId (debe tener el valor del examen) -->
+                <input type="hidden" asp-for="ExamId" />
+
+                <!-- Campo oculto para almacenar el JSON validado -->
+                <input type="hidden" id="validatedConfiguration" name="validatedConfiguration" />
+
+                <div class="mb-3">
+                    <label asp-for="QuestionText" class="form-label">Enunciado de la Pregunta</label>
+                    <textarea asp-for="QuestionText" class="form-control" required
+                              placeholder="Describe aquí la pregunta..."></textarea>
+                    <span asp-validation-for="QuestionText" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="QuestionType" class="form-label">Tipo de Pregunta</label>
+                    <select asp-for="QuestionType" class="form-select" onchange="toggleCodigoFields(this)" required id="QuestionType">
+                        <option value="">-- Seleccione el tipo de pregunta --</option>
+                        <option value="texto">Pregunta de Texto</option>
+                        <option value="codigo">Pregunta de Código</option>
+                        <option value="multipla">Pregunta de Opción Múltiple</option>
+                    </select>
+                    <span asp-validation-for="QuestionType" class="text-danger"></span>
+                </div>
+
+                <!-- Sección para preguntas de tipo "codigo" -->
+                <div id="codigoFields" style="display:@displayCodigo;">
+                    <div class="mb-3">
+                        <label class="form-label">Lenguaje de Programación</label>
+                        <select class="form-select" id="selectedLanguage" name="selectedLanguage">
+                            <option value="">-- Seleccione un lenguaje --</option>
+                            @foreach (var lang in languages)
+                            {
+                                <option value="@lang.language_id">@lang.language_id (@lang.version)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="sourceCode" class="form-label">Código a Evaluar</label>
+                        <textarea id="sourceCode" name="sourceCode" class="form-control"
+                                  placeholder="Escribe o pega aquí el código fuente..." style="height:150px;"
+                                  oninput="console.log('sourceCode (oninput):', this.value)"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-info" id="validateCodeBtn" onclick="validateCode()">
+                            Validar Código
+                        </button>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Configuración JSON Generada</label>
+                        <textarea id="jsonResult" class="form-control" style="height:200px;" disabled></textarea>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Weight" class="form-label">Puntaje</label>
+                    <input asp-for="Weight" class="form-control" required placeholder="Asigna un valor o puntaje a esta pregunta" />
+                    <span asp-validation-for="Weight" class="text-danger"></span>
+                </div>
+
+                <input type="hidden" asp-for="Status" value="ACTIVE" />
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-success">Crear Pregunta</button>
+                    <a asp-action="Index" asp-route-examId="@Model.ExamId" class="btn btn-secondary ms-2">
+                        Volver a la Lista
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Al cargar la página, si el tipo de pregunta no es "codigo", deshabilitar el botón de validación
+        window.addEventListener('DOMContentLoaded', function () {
+            var questionType = document.getElementById("QuestionType").value;
+            var validateBtn = document.getElementById("validateCodeBtn");
+            validateBtn.disabled = (questionType !== "codigo");
+        });
+
+        function toggleCodigoFields(selectElement) {
+            var codigoFields = document.getElementById("codigoFields");
+            var validateBtn = document.getElementById("validateCodeBtn");
+
+            if (selectElement.value === "codigo") {
+                codigoFields.style.display = "block";
+                validateBtn.disabled = false;
+            } else {
+                codigoFields.style.display = "none";
+                validateBtn.disabled = true;
+            }
+        }
+
+        function validateCode() {
+            var sourceCodeElement = document.getElementById("sourceCode");
+            if (!sourceCodeElement) {
+                alert("No se encontró el campo de código a evaluar.");
+                return;
+            }
+            console.log("Valor original en el textarea:", sourceCodeElement.value);
+            var sourceCode = sourceCodeElement.value.trim();
+            console.log("Valor después de trim():", sourceCode);
+
+            var selectedLanguage = document.getElementById("selectedLanguage").value;
+
+            fetch('@Url.Action("ValidateCode", "ExamQuestions")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': '@Antiforgery.GetAndStoreTokens(ViewContext.HttpContext).RequestToken'
+                },
+                body: JSON.stringify({
+                    selectedLanguage: selectedLanguage,
+                    sourceCode: sourceCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("jsonResult").value = data.configuration;
+                    document.getElementById("validatedConfiguration").value = data.configuration;
+                } else {
+                    alert("Error: " + data.message);
+                }
+            })
+            .catch(error => {
+                alert("Error en la validación: " + error);
+            });
+        }
+    </script>
+
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

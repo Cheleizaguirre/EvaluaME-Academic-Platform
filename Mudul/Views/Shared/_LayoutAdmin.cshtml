@@ -1,0 +1,74 @@
+﻿@using Mudul.Helpers
+
+@{
+	Layout = "_LayoutAdminLTE";
+}
+
+<!-- CustomStyles -->
+@RenderSection("CustomStyles", required: false)
+<!-- /.CustomStyles -->
+
+@section SidebarItems {
+	<!-- Home view -->
+	<li class="nav-item">
+		<a href="@Url.Action("Index","Admin")" class="nav-link @Html.IsActive("Index","Admin")">
+			<i class="nav-icon fas fa-home"></i>
+			<p>Inicio</p>
+		</a>
+	</li>
+
+	<!-- Teacher Management -->
+	<li class="nav-item">
+		<a href="@Url.Action("TeacherManagement","Admin")" class="nav-link @Html.IsActive("TeacherManagement","Admin")">
+			<i class="nav-icon fas fa-chalkboard-teacher">&ensp;</i>
+			<p>Administrar Docentes</p>
+		</a>
+	</li>
+
+	<!-- Student Management -->
+	<li class="nav-item">
+		<a href="@Url.Action("StudentManagement","Admin")" class="nav-link @Html.IsActive("StudentManagement","Admin")">
+			<i class="nav-icon fa-regular fa-id-card"></i>
+			<p>Administrar Estudiantes</p>
+		</a>
+	</li>
+
+	<!-- Student Registration -->
+	<li class="nav-item">
+		<a href="@Url.Action("Index","Enrollment")" class="nav-link @Html.IsActive("Index","Enrollment")">
+			<i class="nav-icon fa-solid fa-address-card"></i>
+			<p>Matricular Estudiante</p>
+		</a>
+	</li>
+
+	<!-- Assignment Management -->
+	<li class="nav-item">
+		<a href="@Url.Action("SubjectManagement","Admin")" class="nav-link @Html.IsActive("SubjectManagement","Admin")">
+			<i class="nav-icon fa-solid fa-book"></i>
+			<p>Administrar Clases</p>
+		</a>
+	</li>
+
+	<!-- Assignment Management -->
+	<li class="nav-item">
+		<a href="@Url.Action("Index","Area")" class="nav-link @Html.IsActive("Index","Area")">
+			<i class="nav-icon fas fa-users"></i>
+			<p>Administrar Areas</p>
+		</a>
+	</li>
+
+	<!-- Profile View -->
+	<li class="nav-item">
+		<a href="@Url.Action("Profile","Admin")" class="nav-link @Html.IsActive("Profile","Admin")">
+			<i class="nav-icon fas fa-user"></i>
+			<p>Perfil</p>
+		</a>
+	</li>
+}
+
+<!-- Main content -->
+@RenderBody()
+<!-- /.content -->
+<!-- Scripts content-->
+@await RenderSectionAsync("Scripts", required: false)
+<!-- /.scripts-->

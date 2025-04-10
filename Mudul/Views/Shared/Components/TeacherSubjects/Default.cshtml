@@ -1,0 +1,24 @@
+﻿@using Mudul.Helpers
+@model Mudul.Models.TeacherModel
+
+@if (Model?.Subjects != null && Model.Subjects.Any())
+{
+	foreach (var subject in Model.Subjects)
+	{
+		<li class="nav-item">
+			@* Need Route to Class *@
+			<a href="@Url.Action("Index", "Subject", new { id = subject.SubjectId })"
+			   class="nav-link
+					@Html.IsActive("Index", "Subject", new { id = subject.SubjectId })">
+				&emsp;
+				<i class="fa-solid fa-book"></i>
+				&nbsp;
+				<p>@subject.Name</p>
+			</a>
+		</li>
+	}
+}
+else
+{
+	<p>No tienes clases asignadas</p>
+})

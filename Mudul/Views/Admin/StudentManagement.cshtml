@@ -1,0 +1,251 @@
+@model ICollection<StudentModel>
+
+@{
+	ViewData["Title"] = "Gestión de Estudiantes";
+	var layoutName = "_Layout";
+
+	if (User.IsInRole("Student"))
+	{
+		layoutName = "_LayoutStudent";
+	}
+	else if (User.IsInRole("Teacher"))
+	{
+		layoutName = "_LayoutTeacher";
+	}
+	else if (User.IsInRole("Coordinator"))
+	{
+		layoutName = "_LayoutCoordinator";
+	}
+	else if (User.IsInRole("Admin"))
+	{
+		layoutName = "_LayoutAdmin";
+	}
+
+	Layout = $"~/Views/Shared/{layoutName}.cshtml";
+}
+
+@section CustomStyles {
+	<!-- DataTables CSS -->
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+	<link rel="stylesheet" href="~/css/admin/StudentManagement/styles.css" asp-append-version="true" />
+}
+
+<div class="container-fluid">
+	<div class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1>Gestión de Estudiantes</h1>
+				</div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item">
+							@{
+								var controllerName = User.IsInRole("Student") ? "Student" :
+								User.IsInRole("Teacher") ? "Teacher" :
+								User.IsInRole("Admin") ? "Admin" : "Home";
+							}
+							<a href="@Url.Action("Index", controllerName)">
+								@controllerName
+							</a>
+						</li>
+						<li class="breadcrumb-item active">Gestión de Estudiantes</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container-fluid">
+	<div class="card">
+		<div class="card-header bg-lightblue text-white">
+			<h3 class="card-title mb-0">Listado de Estudiantes</h3>
+		</div>
+
+		<div class="card-body">
+
+			<!-- Botón alineado al extremo derecho -->
+			<div class="d-flex justify-content-end mb-3">
+				<a href="@Url.Action("Index","Enrollment")" class="btn bg-olive" id="createStudentBtn">
+					<i class="fas fa-plus"></i> Matricular Estudiante
+				</a>
+
+			</div>
+			<div class="search-container mb-3">
+				<label for="searchInput">Buscar</label>
+				<input type="text" id="searchInput" class="form-control" placeholder="Buscar estudiantes...">
+			</div>
+
+			<table id="studentsTable" class="table table-striped table-hover" style="width:100%">
+				<thead>
+					<tr>
+						<th>NATIONAL_ID</th>
+						<th>FULLNAME</th>
+						<th>EMAIL</th>
+						<th>ACTION</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var student in Model)
+					{
+						<tr>
+							<td>@student.NationalId</td>
+							<td>@student.FullName</td>
+							<td>@student.Email</td>
+							<td>
+								<button type="button" class="btn btn-sm bg-olive edit-student" data-id="@student.UserId">
+									<i class="fas fa-edit"></i>
+								</button>
+								<a href="#" class="btn btn-sm btn-danger delete-student" data-id="@student.UserId">
+									<i class="fas fa-trash-alt"></i>
+								</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+
+	<!-- Aquí se cargará dinámicamente el modal generado por el ViewComponent -->
+	<div id="editStudentModalContainer"></div>
+
+	<!-- Aquí se cargará dinámicamente el modal para crear docente -->
+	<div id="createStudentModalContainer"></div>
+</div>
+
+@section Scripts {
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+
+	<script>
+		$(document).ready(function () {
+			var table = $('#studentsTable').DataTable({
+				paging: true,
+				ordering: true,
+				responsive: true,
+				searching: true,
+				language: {
+					lengthMenu: "Mostrar _MENU_ registros",
+					info: "Mostrando _START_ a _END_ de _TOTAL_ estudiantes",
+					paginate: {
+						first: "Primero",
+						last: "Último",
+						next: "Siguiente",
+						previous: "Anterior"
+					},
+					emptyTable: "No hay datos disponibles en la tabla",
+					infoEmpty: "Mostrando 0 a 0 de 0 estudiantes",
+					infoFiltered: "(filtrado de _MAX_ registros totales)",
+					loadingRecords: "Cargando...",
+					processing: "Procesando...",
+					zeroRecords: "No se encontraron coincidencias"
+				},
+				dom: 'lfrtip'
+			});
+
+			$('#searchInput').on('keyup', function () {
+				table.search(this.value).draw();
+			});
+
+			$(document).on("click", ".delete-student", function (e) {
+				e.preventDefault();
+				var $button = $(this);
+				var studentId = $button.data("id");
+				var token = $('input[name="__RequestVerificationToken"]').val();
+
+				Swal.fire({
+					title: "¿Estás seguro?",
+					text: "Esta acción eliminará al estudiante de forma permanente.",
+					icon: "warning",
+					showCancelButton: true,
+					confirmButtonColor: "#d33",
+					cancelButtonColor: "#3085d6",
+					confirmButtonText: "Sí, eliminar",
+					cancelButtonText: "Cancelar"
+				}).then((result) => {
+					if (result.isConfirmed) {
+						$.post("@Url.Action("StudentDelete", "Admin")", {
+							id: studentId,
+							__RequestVerificationToken: token
+						}, function () {
+							table.row($button.parents('tr')).remove().draw();
+
+							Swal.fire({
+								icon: "success",
+								title: "Estudiante eliminado",
+								showConfirmButton: false,
+								timer: 2000,
+								toast: true,
+								position: "top-end"
+							});
+						}).fail(function () {
+							Swal.fire({
+								icon: "error",
+								title: "Error",
+								text: "No se pudo eliminar el estudiante.",
+								toast: true,
+								position: "top-end",
+								showConfirmButton: false,
+								timer: 3000
+							});
+						});
+					}
+				});
+			});
+
+			$(document).on("click", ".edit-student", function () {
+				var studentId = $(this).data("id");
+
+				// Carga dinámica del componente de edición
+				$.get("@Url.Action("StudentEditModal", "Admin")", { id: studentId }, function (html) {
+					$("#editStudentModalContainer").html(html);
+					$("#editStudentModal").modal("show");
+				}).fail(function () {
+					alert("Error al cargar el modal de edición.");
+				});
+			});
+		});
+	</script>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+		@if (TempData["SuccessMessage"] != null)
+		{
+			<text>
+										Swal.fire({
+											toast: true,
+										position: "top-end",
+										title: "¡Éxito!",
+										text: decodeURIComponent("@Uri.EscapeDataString(TempData["SuccessMessage"].ToString())"),
+										icon: "success",
+										showConfirmButton: false,
+										timer: 3000,
+										timerProgressBar: true
+																		});
+			</text>
+		}
+
+		@if (TempData["ErrorMessage"] != null)
+		{
+			<text>
+											Swal.fire({
+												toast: true,
+											position: "top-end",
+											title: "¡Error!",
+											text: decodeURIComponent("@Uri.EscapeDataString(TempData["ErrorMessage"].ToString())"),
+											icon: "error",
+											showConfirmButton: false,
+											timer: 3000,
+											timerProgressBar: true
+																			});
+			</text>
+		}
+							});
+	</script>
+
+}

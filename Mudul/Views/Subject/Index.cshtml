@@ -1,0 +1,218 @@
+@using Mudul.EntityModels
+@model Subject
+
+@{
+    ViewData["Title"] = "Gestor de Clases";
+    var layoutName = "_Layout";
+
+    if (User.IsInRole("Student"))
+    {
+        layoutName = "_LayoutStudent";
+    }
+    else if (User.IsInRole("Teacher"))
+    {
+        layoutName = "_LayoutTeacher";
+    }
+    else if (User.IsInRole("Coordinator"))
+    {
+        layoutName = "_LayoutCoordinator";
+    }
+    Layout = $"~/Views/Shared/{layoutName}.cshtml";
+
+    var subjectId = Model.SubjectId;
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>@Model.Name</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">
+                        @{
+                            var controllerName = "Home";
+                            if (User.IsInRole("Student"))
+                            {
+                                controllerName = "Student";
+                            }
+                            else if (User.IsInRole("Teacher"))
+                            {
+                                controllerName = "Teacher";
+                            }
+                            else if (User.IsInRole("Coordinator"))
+                            {
+                                controllerName = "Coordinator";
+                            }
+                        }
+                        <a href="@Url.Action("Index", controllerName)">@controllerName</a>
+                    </li>
+                    <li class="breadcrumb-item active">@Model.Name</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section id="tabs-section" class="pt-1 pl-2">
+    <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs" id="subject-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="general-tab" data-toggle="pill" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="first-tab" data-toggle="pill" href="#first" role="tab" aria-controls="first" aria-selected="false">Primer Parcial</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="second-tab" data-toggle="pill" href="#second" role="tab" aria-controls="second" aria-selected="false">Segundo Parcial</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="third-tab" data-toggle="pill" href="#third" role="tab" aria-controls="third" aria-selected="false">Tercer Parcial</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="fourth-tab" data-toggle="pill" href="#fourth" role="tab" aria-controls="fourth" aria-selected="false">Cuarto Parcial</a>
+            </li>
+            @if (User.IsInRole("Teacher"))
+            {
+                <li class="nav-item ml-auto d-flex align-items-center">
+                    <span class="mr-2">Modo Edición</span>
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="editModeSwitch" @(ViewBag.ShowCreateExam != null && (bool)ViewBag.ShowCreateExam ? "checked" : "")>
+                        <label class="custom-control-label" for="editModeSwitch"></label>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div class="tab-content" id="subject-tabs-content">
+        <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Descripción General</h3>
+                </div>
+                <div class="card-body">
+                    <p>@(Model.Description ?? "No hay descripción disponible para esta clase.")</p>
+                    @if (!User.IsInRole("Teacher"))
+                    {
+                        <div class="teacher-info mt-4">
+                            <h3>Docente: @Model.Teacher.UserName</h3>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Primer Parcial -->
+        <div class="tab-pane fade" id="first" role="tabpanel" aria-labelledby="first-tab">
+            <div class="card shadow-lg">
+                <div class="card-header">
+                    <h3 class="card-title">Primer Parcial - Exámenes y Actividades</h3>
+                </div>
+                <div class="card-body">
+                    @if (Model.Exams != null && Model.Exams.Any(e => e.ExamType == "Jobe" || e.ExamType == "H5P"))
+                    {
+                        <div class="row">
+                            @foreach (var exam in Model.Exams.Where(e => e.ExamType == "Jobe" || e.ExamType == "H5P"))
+                            {
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card shadow-sm h-100">
+                                        <div class="card-body d-flex flex-column">
+                                            <h5 class="card-title font-weight-bold text-primary">@exam.Title</h5>
+                                            <p class="card-text text-muted">
+                                                @(exam.Description != null && exam.Description.Length > 100
+                                                    ? exam.Description.Substring(0, 100) + "..."
+                                                    : exam.Description ?? "Sin descripción")
+                                            </p>
+                                            <ul class="list-unstyled mt-auto">
+                                                <li><strong>Tipo:</strong> @exam.ExamType</li>
+                                                <li><strong>Fecha de Publicación:</strong> @(exam.PublishDate?.ToString("dd/MM/yyyy") ?? "No disponible")</li>
+                                            </ul>
+                                            <div class="mt-3">
+                                                @if (User.IsInRole("Student"))
+                                                {
+                                                    <a href="@Url.Action("Attempt", "ExamSubmission", new { examId = exam.ExamId })" class="btn btn-outline-success btn-sm">
+                                                        <i class="fas fa-pencil-alt"></i> Intentar
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@Url.Action("Index", "ExamQuestions", new { examId = exam.ExamId })" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i> Ver
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">No hay exámenes disponibles para el primer parcial.</div>
+                    }
+
+                    @if (User.IsInRole("Teacher") && ViewBag.ShowCreateExam == true)
+                    {
+                        <div class="mt-3">
+                            <a class="btn btn-success" href="@Url.Action("Create", "Exams", new { subjectId = Model.SubjectId, subjectName = Model.Name })">
+                                <i class="fas fa-plus"></i> Crear Examen
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Segundo Parcial -->
+        <div class="tab-pane fade" id="second" role="tabpanel" aria-labelledby="second-tab">
+            <div class="alert alert-info">No hay exámenes disponibles para el segundo parcial.</div>
+        </div>
+
+        <!-- Tercer Parcial -->
+        <div class="tab-pane fade" id="third" role="tabpanel" aria-labelledby="third-tab">
+            <div class="alert alert-info">No hay exámenes disponibles para el tercer parcial.</div>
+        </div>
+
+        <!-- Cuarto Parcial -->
+        <div class="tab-pane fade" id="fourth" role="tabpanel" aria-labelledby="fourth-tab">
+            <div class="alert alert-info">No hay exámenes disponibles para el cuarto parcial.</div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @if (User.IsInRole("Teacher"))
+    {
+        <script>
+            document.getElementById("editModeSwitch").addEventListener("change", function () {
+                const subjectId = @subjectId;
+                window.location.href = this.checked
+                    ? `/Subject/Edit/${subjectId}`
+                    : `/Subject/Index/${subjectId}`;
+            });
+        </script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <text>
+                        Swal.fire({
+                            toast: true,
+                            position: "top-end",
+                            title: "¡Éxito!",
+                            text: decodeURIComponent("@Uri.EscapeDataString(TempData["SuccessMessage"].ToString())"),
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                    </text>
+                }
+            });
+        </script>
+    }
+}

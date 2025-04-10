@@ -1,0 +1,78 @@
+@model Mudul.EntityModels.Exam
+
+@{
+    ViewData["Title"] = "Editar Examen";
+    Layout = "_LayoutTeacher";
+}
+
+<h1>Editar Examen</h1>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input type="hidden" asp-for="ExamId" />
+
+    <!-- Campos de edición (Title, Description, etc.) -->
+    <div class="form-group">
+        <label asp-for="Title" class="control-label"></label>
+        <input asp-for="Title" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Description" class="control-label"></label>
+        <input asp-for="Description" class="form-control" />
+    </div>
+    <!-- etc. -->
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+</form>
+
+<!-- Sección de preguntas asociadas a este examen -->
+<hr />
+<h3>Preguntas del Examen</h3>
+@if (Model.ExamQuestions != null && Model.ExamQuestions.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Texto</th>
+                <th>Tipo</th>
+                <th>Puntaje</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var q in Model.ExamQuestions)
+            {
+                <tr>
+                    <td>@q.QuestionText</td>
+                    <td>@q.QuestionType</td>
+                    <td>@q.Weight</td>
+                    <td>
+                        <a asp-controller="ExamQuestions" asp-action="Edit" asp-route-id="@q.QuestionId">Editar</a> |
+                        <a asp-controller="ExamQuestions" asp-action="Delete" asp-route-id="@q.QuestionId">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No hay preguntas registradas.</p>
+}
+
+<a class="btn btn-success"
+   asp-controller="ExamQuestions"
+   asp-action="Create"
+   asp-route-examId="@Model.ExamId">
+    Crear Nueva Pregunta
+</a>
+
+<br />
+<br />
+<a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

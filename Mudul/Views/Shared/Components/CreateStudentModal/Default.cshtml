@@ -1,0 +1,53 @@
+﻿<!-- Modal para Inscribir Alumno -->
+<div class="modal fade" id="createStudentModal" tabindex="-1" role="dialog" aria-labelledby="createStudentModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<!-- Se agregó modal-lg -->
+		<div class="modal-content">
+			<div class="modal-header bg-secondary">
+				<h5 class="modal-title text-white" id="createStudentModalLabel">
+					<i class="fas fa-user-plus"></i> Inscribir Alumno
+				</h5>
+				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+
+			<!-- Formulario para inscribir alumno -->
+			<form id="singleStudent-form" asp-controller="Enrollment" asp-action="CreateOneStudent" method="post">
+				<div class="modal-body">
+
+					<div class="form-group">
+						<label for="NationalId">Número de Identidad</label>
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text"><i class="fas fa-id-card"></i></span>
+							</div>
+							<input type="text" class="form-control" id="NationalId" name="NationalId" required>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="FullName">Nombre Completo</label>
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text"><i class="fas fa-user"></i></span>
+							</div>
+							<input type="text" class="form-control" id="FullName" name="FullName" required>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">
+						<i class="fas fa-times"></i> Cancelar
+					</button>
+					<button type="submit" class="btn btn-primary" id="uploadSingleStudent-btn-db">
+						<i class="fas fa-check"></i> Inscribir Alumno
+					</button>
+				</div>
+			</form>
+
+		</div>
+	</div>
+</div>

@@ -1,0 +1,323 @@
+/* Estilos comunes */
+.studentManagement-content * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.studentManagement-content body {
+    background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+    padding: 40px 20px;
+}
+
+.studentManagement-content .container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: left;
+    padding-top: 20px;
+}
+
+.studentManagement-content h1 {
+    font-size: 28px;
+    color: #222;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.studentManagement-content .button-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+    .studentManagement-content .button-container button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 0;
+        background: #396cd8; /* Color base */
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+    }
+
+        .studentManagement-content .button-container button:hover {
+            background: #4a90e2;
+            transform: translateY(-2px);
+        }
+
+.studentManagement-content .upload-section {
+    background: linear-gradient(135deg, #ffffff, #f5f7fa);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+    .studentManagement-content .upload-section h2 {
+        font-size: 20px;
+        color: #222;
+        margin-bottom: 15px;
+    }
+
+.studentManagement-content .drag-drop-area {
+    border: 2px dashed #396cd8;
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    background-color: rgba(249, 249, 249, 0.8);
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+    .studentManagement-content .drag-drop-area:hover {
+        background-color: rgba(240, 240, 240, 0.8);
+        border-color: #4a90e2;
+    }
+
+    .studentManagement-content .drag-drop-area i {
+        font-size: 40px;
+        color: #396cd8;
+        margin-bottom: 10px;
+    }
+
+    .studentManagement-content .drag-drop-area p {
+        font-size: 16px;
+        color: #555;
+        margin: 0;
+    }
+
+.studentManagement-content .file-name {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555;
+    text-align: center;
+}
+
+.studentManagement-content .table-section {
+    padding: 20px;
+    margin-top: 20px;
+}
+
+    .studentManagement-content .table-section h2 {
+        font-size: 20px;
+        color: #222;
+        margin-bottom: 15px;
+    }
+
+.studentManagement-content .table-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+    .studentManagement-content .table-buttons button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 0;
+        background: #396cd8; /* Color base */
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .studentManagement-content .table-buttons button:hover {
+            background: #4a90e2;
+            transform: translateY(-2px);
+        }
+
+.studentManagement-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+    .studentManagement-content table th {
+        padding: 12px;
+        text-align: left;
+        background-color: #396cd8;
+        color: white;
+        font-weight: 600;
+    }
+
+    .studentManagement-content table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+.studentManagement-content .footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 14px;
+    color: #555;
+}
+
+.studentManagement-content .upload-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 0;
+    background: #396cd8;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    width: 100%;
+}
+
+    .studentManagement-content .upload-btn:hover {
+        background: #4a90e2;
+        transform: translateY(-2px);
+    }
+
+    .studentManagement-content .upload-btn:disabled {
+        background: #ddd;
+        cursor: not-allowed;
+    }
+
+/* Estilos por rol */
+
+/* Teacher */
+.studentManagement-content.role-teacher .button-container button {
+    background-color: #17a2b8; /* Info color de AdminLTE */
+}
+
+.studentManagement-content.role-teacher .drag-drop-area {
+    border: 2px dashed #17a2b8; /* Info color de AdminLTE */
+}
+
+.studentManagement-content.role-teacher .table-buttons button {
+    background-color: #17a2b8; /* Info color de AdminLTE */
+}
+
+/* Coordinator */
+.studentManagement-content.role-coordinator .button-container button {
+    background-color: #3d9970; /* Olive color de AdminLTE */
+}
+
+.studentManagement-content.role-coordinator .drag-drop-area {
+    border: 2px dashed #3d9970; /* Olive color de AdminLTE */
+}
+
+.studentManagement-content.role-coordinator .table-buttons button {
+    background-color: #3d9970; /* Olive color de AdminLTE */
+}
+
+/* Tabla - Número de Identidad y Nube */
+
+/* Estilo para la celda del número de identidad */
+.studentManagement-content table td.identity {
+    font-size: 16px;
+    color: #555;
+    font-weight: bold;
+    text-align: center;
+    padding: 12px;
+    background-color: #f9f9f9;
+}
+
+/* Estilo para la celda de la nube (suponiendo que es un icono o un botón) */
+.studentManagement-content table td.cloud {
+    font-size: 20px;
+    color: #396cd8; /* Color base */
+    text-align: center;
+    padding: 12px;
+}
+
+    /* Estilo para la nube (en hover o acción) */
+    .studentManagement-content table td.cloud:hover {
+        color: #4a90e2; /* Hover color */
+        cursor: pointer;
+        transform: translateY(-2px);
+    }
+
+/* Ajustes específicos para cuando los roles se apliquen en la tabla */
+
+.studentManagement-content.role-teacher table td.identity {
+    color: #17a2b8; /* Info color de AdminLTE */
+}
+
+.studentManagement-content.role-teacher table td.cloud {
+    color: #17a2b8; /* Info color de AdminLTE */
+}
+
+.studentManagement-content.role-coordinator table td.identity {
+    color: #3d9970; /* Olive color de AdminLTE */
+}
+
+.studentManagement-content.role-coordinator table td.cloud {
+    color: #ffc107; /* Warning color de AdminLTE */
+}
+
+.studentManagement-content.role-student table td.identity {
+    color: #28a745; /* Success color de AdminLTE */
+}
+
+.studentManagement-content.role-student table td.cloud {
+    color: #28a745; /* Success color de AdminLTE */
+}
+
+/* Estilos personalizados según el rol para la nube de subir archivo */
+.studentManagement-content.role-teacher .drag-drop-area {
+    border: 2px dashed #17a2b8; /* Color de info (AdminLTE) para Teacher */
+    background-color: rgba(23, 162, 184, 0.1); /* Color suave de fondo */
+}
+
+.studentManagement-content.role-coordinator .drag-drop-area {
+    border: 2px dashed #3d9970; /* Color de olive (AdminLTE) para Coordinator */
+    background-color: rgba(61, 153, 112, 0.1); /* Color suave de fondo */
+}
+
+.studentManagement-content.role-student .drag-drop-area {
+    border: 2px dashed #396cd8; /* Color base para Student */
+    background-color: rgba(57, 108, 216, 0.1); /* Color suave de fondo */
+}
+
+/* Estilos personalizados según el rol para los encabezados de la tabla */
+.studentManagement-content.role-teacher table th {
+    background-color: #17a2b8; /* Color de info (AdminLTE) para Teacher */
+}
+
+.studentManagement-content.role-coordinator table th {
+    background-color: #3d9970; /* Color de olive (AdminLTE) para Coordinator */
+}
+
+/* Admin */
+.studentManagement-content.role-admin .button-container button {
+    background-color: #001f3f; /* Navy color de AdminLTE */
+}
+
+.studentManagement-content.role-admin .drag-drop-area {
+    border: 2px dashed #001f3f; /* Navy color de AdminLTE */
+    background-color: rgba(0, 31, 63, 0.1); /* Suave fondo navy */
+}
+
+.studentManagement-content.role-admin .table-buttons button {
+    background-color: #001f3f; /* Navy color de AdminLTE */
+}
+
+.studentManagement-content.role-admin table td.identity {
+    color: #001f3f; /* Navy */
+}
+
+.studentManagement-content.role-admin table td.cloud {
+    color: #001f3f; /* Navy */
+}
+
+.studentManagement-content.role-admin table th {
+    background-color: #001f3f; /* Encabezados navy */
+}

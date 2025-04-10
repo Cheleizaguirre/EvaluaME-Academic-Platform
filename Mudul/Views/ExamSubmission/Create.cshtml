@@ -1,0 +1,63 @@
+@model Mudul.EntityModels.ExamSubmission
+
+@{
+    ViewData["Title"] = "Enviar Examen";
+    Layout = "_LayoutStudent"; // Usamos el layout de estudiante
+                               // Obtenemos el examen a través de ViewBag.Exam (lo pasamos desde el controlador)
+    var exam = ViewBag.Exam as Mudul.EntityModels.Exam;
+}
+
+<h1>Enviar Examen</h1>
+
+@if (exam != null)
+{
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>@exam.Title</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Descripción:</strong> @exam.Description</p>
+            <p><strong>Fecha de Publicación:</strong> @(exam.PublishDate.HasValue ? exam.PublishDate.Value.ToString("dd/MM/yyyy") : "No disponible")</p>
+            <!-- Puedes agregar más datos relevantes del examen si lo deseas -->
+        </div>
+    </div>
+}
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <!-- Campo oculto con el ExamId -->
+    <input type="hidden" asp-for="ExamId" />
+
+    <div class="form-group">
+        <label asp-for="ResponseData" class="control-label">Tus Respuestas</label>
+        <textarea asp-for="ResponseData" class="form-control" rows="10" placeholder="Ingresa tus respuestas..."></textarea>
+        <span asp-validation-for="ResponseData" class="text-danger"></span>
+    </div>
+
+    <!-- Opcional: si deseas que el estudiante pueda ver o ingresar el GlobalResult (por ejemplo, comentarios) -->
+    <div class="form-group">
+        <label asp-for="GlobalResult" class="control-label">Resultado Global (opcional)</label>
+        <input asp-for="GlobalResult" class="form-control" placeholder="Si lo deseas, ingresa un comentario o resultado global." />
+        <span asp-validation-for="GlobalResult" class="text-danger"></span>
+    </div>
+
+    <!-- Puedes mostrar el AttemptNumber o permitir al estudiante iniciar un nuevo intento, según la lógica de negocio -->
+    <div class="form-group">
+        <label asp-for="AttemptNumber" class="control-label">Intento Número</label>
+        <input asp-for="AttemptNumber" class="form-control" readonly value="1" />
+        <span asp-validation-for="AttemptNumber" class="text-danger"></span>
+    </div>
+
+    <input type="hidden" asp-for="Status" value="ACTIVE" />
+
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-primary">Enviar Examen</button>
+        <a asp-action="Index" class="btn btn-secondary">Volver a mis Envíos</a>
+    </div>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

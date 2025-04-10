@@ -1,0 +1,83 @@
+﻿@page
+@model LoginModel
+
+<img class="wave" src="~/img/LoginIMG/wave.webp" asp-append-version="true" />
+<div class="container">
+	<div class="img">
+		<img src="~/img/LoginIMG/students.webp" asp-append-version="true" />
+	</div>
+	<div class="login-content">
+		<form id="account" method="post">
+			<!-- Avatar -->
+			<a href="@Url.Action("Index", "Home")">
+				<img class="avatar" src="~/img/LoginIMG/LOGO-JTR.webp" asp-append-version="true" />
+			</a>
+			<h2 class="title">EVALUA-ME</h2>
+			<h4 class="subtitle">Portal Educativo - JTR</h4>
+			<div class="error-message-container">
+				<div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+			</div>
+
+
+			<div class="input-div one">
+				<div class="i">
+					<i class="fas fa-user"></i>
+				</div>
+				<div class="div">
+					<h5 asp-for="Input.Email">Username</h5>
+					<input asp-for="Input.Email" autocomplete="username" aria-required="true" placeholder="name@example.com" type="text" class="input">
+					<span asp-validation-for="Input.Email" class="text-danger"></span>
+				</div>
+			</div>
+			<div class="input-div pass">
+				<div class="i">
+					<i class="fas fa-lock"></i>
+				</div>
+				<div class="div">
+					<h5 asp-for="Input.Password">Password</h5>
+					<input asp-for="Input.Password" autocomplete="current-password" aria-required="true" placeholder="password" type="password" class="input">
+					<span asp-validation-for="Input.Password" class="text-danger"></span>
+				</div>
+			</div>
+			<input id="login-submit" type="submit" class="btn" value="Login">
+			<!-- Remember me -->
+			<div class="checkbox mb-3">
+				<label asp-for="Input.RememberMe" class="form-label">
+					<input class="form-check-input" asp-for="Input.RememberMe" />
+					@Html.DisplayNameFor(m => m.Input.RememberMe)
+				</label>
+			</div>
+
+
+		</form>
+	</div>
+</div>
+
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		// Manejo de focus en los inputs
+		document.querySelectorAll(".input-div").forEach(div => {
+			let input = div.querySelector("input");
+			if (input.value.trim() !== "") {
+				div.classList.add("focus");
+			}
+
+			input.addEventListener("focus", () => div.classList.add("focus"));
+			input.addEventListener("blur", () => {
+				if (input.value.trim() === "") {
+					div.classList.remove("focus");
+				}
+			});
+		});
+
+		// Manejo de errores y animación de desplazamiento
+		let errorContainer = document.querySelector(".error-message-container");
+		let loginContent = document.querySelector(".login-content");
+
+		if (errorContainer && errorContainer.innerText.trim() !== "") {
+			errorContainer.style.opacity = "1";
+			loginContent.classList.add("has-error");
+		}
+	});
+</script>
+

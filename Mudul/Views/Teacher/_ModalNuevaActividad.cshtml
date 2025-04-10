@@ -1,0 +1,40 @@
+﻿
+<!-- Modal para crear una nueva actividad -->
+<div class="modal fade" id="modalNuevaActividad" tabindex="-1" aria-labelledby="modalNuevaActividadLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNuevaActividadLabel">Crear Nueva Actividad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNuevaActividad" method="post" action="/Teacher/CreateEvaluation">
+                    <div class="mb-3">
+                        <label for="nombreActividad" class="form-label">Nombre de la Actividad</label>
+                        <input type="text" class="form-control" id="nombreActividad" name="nombreActividad" placeholder="Nombre de la actividad" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcionActividad" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcionActividad" name="descripcionActividad" rows="3" placeholder="Descripción de la actividad"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tipoEvaluacion" class="form-label">Tipo de Evaluación</label>
+                        <select class="form-select" id="tipoEvaluacion" name="tipoEvaluacion" required>
+                            <option value="">Seleccione el parcial</option>
+                            <!-- Placeholder: Las opciones se deben llenar desde el controlador -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaEvaluacion" class="form-label">Fecha de Evaluación</label>
+                        <input type="date" class="form-control" id="fechaEvaluacion" name="fechaEvaluacion" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" form="formNuevaActividad">Crear Actividad</button>
+            </div>
+        </div>
+    </div>
+</div>
+

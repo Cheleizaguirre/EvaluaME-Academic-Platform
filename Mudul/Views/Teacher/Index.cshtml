@@ -1,0 +1,126 @@
+﻿@using Mudul.Models
+@model IEnumerable<SubjectViewModel>
+
+@{
+	ViewData["Title"] = "Docente";
+	Layout = "~/Views/Shared/_LayoutTeacher.cshtml";
+
+	// Lista de colores disponibles
+	var colors = new List<string> { "bg-gray", "bg-info", "bg-olive", "bg-lightblue" };
+	Random rnd = new Random();
+	string lastColor = "";
+}
+
+@section CustomStyles {
+	<link rel="stylesheet" href="~/css/SubjectIndex/style.css" asp-append-version="true" />
+	<style>
+		/* Animación de cambio de vista */
+		.fade-transition {
+			opacity: 0;
+			transition: opacity 0.5s ease-in-out;
+		}
+
+		.fade-in {
+			opacity: 1 !important;
+		}
+	</style>
+}
+
+<div class="content-header">
+	<div class="container-fluid">
+		<div class="row mb-2">
+			<div class="col-sm-6">
+				<h1>¡Bienvenido!</h1>
+			</div>
+			<div class="col-sm-6">
+				<ol class="breadcrumb float-sm-right">
+					<li class="breadcrumb-item"><a>Home</a></li>
+				</ol>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<!-- Switch animado para cambiar la vista -->
+	<div class="view-toggle text-right mb-3">
+		<label class="switch">
+			<input type="checkbox" id="viewToggle">
+			<span class="slider round"></span>
+		</label>
+		Modo Cuadrícula
+	</div>
+
+	<div id="classContainer" class="row list-view fade-transition justify-content-center">
+		@foreach (var subject in Model)
+		{
+			var studentLabel = subject.StudentCount > 1 ? "Alumnos" : "Alumno";
+
+			// Asignar un color sin repetir el anterior
+			string colorClass;
+			do
+			{
+				colorClass = colors[rnd.Next(colors.Count)];
+			} while (colorClass == lastColor);
+			lastColor = colorClass;
+
+			<!-- Modo Cuadrícula -->
+			<div class="class-item grid-mode col-lg-3 col-md-4 col-sm-6 col-12">
+				<div class="info-box @colorClass">
+					<a href="@Url.Action("Index", "Subject", new { id = subject.Id })">
+						<span class="info-box-icon @colorClass">
+							<i class="fa-solid fa-book-open"></i>
+						</span>
+						<div class="info-box-content">
+							<span class="info-box-text">@subject.Name</span>
+							<span class="info-box-number">@subject.StudentCount @studentLabel</span>
+						</div>
+					</a>
+				</div>
+			</div>
+
+			<!-- Modo Lista -->
+			<div class="class-item list-mode col-12">
+				<div class="small-box @colorClass">
+					<div class="inner">
+						<h3>@subject.Name</h3>
+						<p>@subject.StudentCount @studentLabel</p>
+					</div>
+					<div class="icon">
+						<i class="fa-solid fa-book-open"></i>
+					</div>
+					<a href="@Url.Action("Index", "Subject", new { id = subject.Id })" class="small-box-footer">
+						Ingresar a la clase <i class="fas fa-arrow-circle-right"></i>
+					</a>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			const viewToggle = document.getElementById("viewToggle");
+			const classContainer = document.getElementById("classContainer");
+
+			// Aparecer la lista al cargar
+			setTimeout(() => classContainer.classList.add("fade-in"), 100);
+
+			// Cambio de vista con animación
+			viewToggle.addEventListener("change", function () {
+				classContainer.classList.remove("fade-in");
+				setTimeout(() => {
+					if (viewToggle.checked) {
+						classContainer.classList.remove("list-view");
+						classContainer.classList.add("grid-view");
+					} else {
+						classContainer.classList.remove("grid-view");
+						classContainer.classList.add("list-view");
+					}
+					classContainer.classList.add("fade-in");
+				}, 300); // Esperar un poco para que se note el cambio
+			});
+		});
+	</script>
+}

@@ -1,0 +1,26 @@
+﻿@using Mudul.Helpers
+@model Mudul.Models.StudentModel
+
+@if (Model?.Enrollments != null && Model.Enrollments.Any())
+{
+	foreach (var enrollment in Model.Enrollments)
+	{
+		<li class="nav-item">
+			@* Need Route to Class *@
+			<a href="@Url.Action("Index", "Subject", new { id = enrollment.Subject.SubjectId })"
+			   class="nav-link
+					@Html.IsActive("Index", "Subject", new { id = enrollment.Subject.SubjectId })">
+
+				&emsp;
+				<i class="fa-solid fa-book"></i>
+				&nbsp;
+
+				<p>@enrollment.Subject.Name</p>
+			</a>
+		</li>
+	}
+}
+else
+{
+	<p>No tienes clases asignadas</p>
+}

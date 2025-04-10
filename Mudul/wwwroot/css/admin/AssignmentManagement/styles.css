@@ -1,0 +1,110 @@
+.assignmentManagement-content * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.assignmentManagement-content body {
+    background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+    padding: 40px 20px;
+}
+
+.assignmentManagement-content .form-container {
+    background: transparent;
+    padding: 30px;
+    max-width: 500px;
+    margin: 0 auto;
+    margin-bottom: 40px;
+    text-align: left;
+}
+
+.assignmentManagement-content .form-container h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #222;
+    font-weight: bold;
+    text-align: left;
+}
+
+.assignmentManagement-content .form-container label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #333;
+}
+
+.assignmentManagement-content .form-container input[type="text"],
+.assignmentManagement-content .form-container input[type="number"],
+.assignmentManagement-content .form-container select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    background: transparent;
+}
+
+.assignmentManagement-content .form-container input:focus,
+.assignmentManagement-content .form-container select:focus {
+    border-color: #396cd8;
+    outline: none;
+}
+
+.assignmentManagement-content .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.assignmentManagement-content .checkbox-group input {
+    width: auto;
+}
+
+.assignmentManagement-content .form-container .button-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.assignmentManagement-content .form-container button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #396cd8, #1e3a8a);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.assignmentManagement-content .form-container button:hover {
+    background: linear-gradient(135deg, #4a90e2, #2251a2);
+    transform: translateY(-2px);
+}
+
+.assignmentManagement-content .form-container button.cancel {
+    background: linear-gradient(135deg, #dc3545, #a71d2a);
+}
+
+.assignmentManagement-content .form-container button.cancel:hover {
+    background: linear-gradient(135deg, #e4606d, #c82333);
+}
+
+.assignmentManagement-content .footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 14px;
+    color: #555;
+}
+
+div.dataTables_filter {
+    display: none;
+}
